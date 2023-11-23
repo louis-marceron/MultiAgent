@@ -25,12 +25,22 @@ to agiterEnCarre
   penup
 end
 
+to agiterEnSpiraleCarree
+  pendown
+  let tailleCote 1
+  repeat 16 [
+    set tailleCote tailleCote + 1
+    fd tailleCote
+    rt 90
+  ]
+  penup
+end
 
 
 to go
-  ifelse typeMouvement = "agiter"
-     [agiter]
-     [agiterEnCarre]
+  if typeMouvement = "agiter" [ agiter ]
+  if typeMouvement = "agiterEnCarre" [ agiterEnCarre ]
+  if typeMouvement = "agiterEnSpiraleCarree" [ agiterEnSpiraleCarree ]
   fd 1
 end
 
@@ -119,11 +129,11 @@ HORIZONTAL
 CHOOSER
 674
 47
-833
+898
 92
 typeMouvement
 typeMouvement
-"agiter" "agiterEnCarre"
+"agiter" "agiterEnCarre" "agiterEnSpiraleCarree"
 0
 
 @#$#@#$#@
