@@ -36,18 +36,44 @@ to agiterEnSpiraleCarree
   penup
 end
 
+to agiterEnCercle
+  pendown
+  let radius 5  ; You can adjust this value for a larger or smaller circle
+  let segments 10  ; More segments will create a smoother circle
+  let angle 360 / segments  ; Calculate the angle for each segment
+
+  repeat segments [
+    forward radius
+    right angle
+  ]
+  penup
+end
+
+to agiterEnSpirale
+  pendown
+  let radius 5  ; You can adjust this value for a larger or smaller circle
+  let segments 10  ; More segments will create a smoother circle
+  let angle 180 / segments  ; Calculate the angle for each segment
+  let numberOfHalfCircle 32
+
+  repeat numberOfHalfCircle [
+    repeat segments [
+       forward radius
+       right angle
+     ]
+    set radius radius + 1
+  ]
+  penup
+end
+
 to go
   if typeMouvement = "agiter" [ agiter ]
   if typeMouvement = "agiterEnCarre" [ agiterEnCarre ]
   if typeMouvement = "agiterEnSpiraleCarree" [ agiterEnSpiraleCarree ]
+  if typeMouvement = "agiterEnCercle" [ agiterEnCercle ]
+  if typeMouvement = "agiterEnSpirale" [ agiterEnSpirale ]
   fd 1
 end
-
-;;-------------------------------------------------------
-;;
-;;  Auteur: J. Ferber
-;;
-;;------------------------------------------------------
 @#$#@#$#@
 GRAPHICS-WINDOW
 200
@@ -118,22 +144,22 @@ SLIDER
 number
 number
 1
-2000
-39.0
+100
+18.0
 1
 1
 NIL
 HORIZONTAL
 
 CHOOSER
-674
-47
-898
-92
+659
+52
+883
+97
 typeMouvement
 typeMouvement
-"agiter" "agiterEnCarre" "agiterEnSpiraleCarree"
-0
+"agiter" "agiterEnCarre" "agiterEnSpiraleCarree" "agiterEnCercle" "agiterEnSpirale"
+4
 
 @#$#@#$#@
 ## QU'EST CE QUE C'EST
