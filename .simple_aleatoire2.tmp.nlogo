@@ -29,23 +29,34 @@ to agiter
   lt random 50
 end
 
-
+to agiterEnCarre
+  repeat 4 [fd 7 rt 90]
+  rt random 50
+  lt random 50
+end
 
 
 to go
-  ask abeilles [go-abeille]
+  ask abeilles [go-abeille 30 ]
   ask reines [go-reine ]
   tick
 end
 
-to go-abeille
- agiter
- fd 1
+to go-abeille [ n ]
+ let nearby-reine one-of reines in-radius
+ if-else nearby-reine != nobody [
+    let reine-xcor [xcor] of nearby-reine
+    let reine-ycor [ycor] of nearby-reine
+    set heading towards nearby-reine
+ ] [
+    fd 1
+ ]
+  fd 1
 end
 
 to go-reine
  agiter
- fd 1
+ fd 2
 end
 
 ;;-------------------------------------------------------
@@ -75,17 +86,17 @@ GRAPHICS-WINDOW
 100
 -100
 100
-0
-0
+1
+1
 0
 ticks
 30.0
 
 BUTTON
-97
-117
-158
-150
+109
+177
+170
+210
 go
 go
 T
@@ -99,10 +110,10 @@ NIL
 1
 
 BUTTON
-24
-117
-85
-150
+29
+176
+90
+209
 setup
 setup
 NIL

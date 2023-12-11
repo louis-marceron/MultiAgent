@@ -1,17 +1,27 @@
+breed [ reines reine ]
+breed [ abeilles abeille ]
+
 to setup
   ;; (for this model to work with NetLogo's new plotting features,
   ;; __clear-all-and-reset-ticks should be replaced with clear-all at
   ;; the beginning of your setup procedure and reset-ticks at the end
   ;; of the procedure.)
-  __clear-all-and-reset-ticks
-  set-default-shape turtles "airplane"
+  clear-all
+  set-default-shape turtles "bug"
 
   ;; place les tortues de maniere aleatoire
-  create-turtles number [
+  create-abeilles nombre-abeilles [
     set color red
     setxy random-xcor random-ycor
     set size 5 ;; pour mieux voir les tortues
   ]
+
+  create-reines nombre-reines [
+    set color green
+    setxy random-xcor random-ycor
+    set size 5 ;; pour mieux voir les tortues
+  ]
+  reset-ticks
 end
 
 to agiter
@@ -67,11 +77,18 @@ to agiterEnSpirale
 end
 
 to go
-  if typeMouvement = "agiter" [ agiter ]
-  if typeMouvement = "agiterEnCarre" [ agiterEnCarre ]
-  if typeMouvement = "agiterEnSpiraleCarree" [ agiterEnSpiraleCarree ]
-  if typeMouvement = "agiterEnCercle" [ agiterEnCercle ]
-  if typeMouvement = "agiterEnSpirale" [ agiterEnSpirale ]
+  ask abeilles [go-abeille]
+  ask reines [go-reine]
+  tick
+end
+
+to go-abeille
+  agiter
+  fd 1
+end
+
+to go-reine
+  agiterEnSpiraleCarree
   fd 1
 end
 @#$#@#$#@
@@ -112,7 +129,7 @@ go
 T
 1
 T
-TURTLE
+OBSERVER
 NIL
 NIL
 NIL
@@ -139,27 +156,32 @@ NIL
 SLIDER
 6
 37
-177
+196
 70
-number
-number
+nombre-abeilles
+nombre-abeilles
 1
 100
-18.0
+76.0
 1
 1
 NIL
 HORIZONTAL
 
-CHOOSER
-659
-52
-883
-97
-typeMouvement
-typeMouvement
-"agiter" "agiterEnCarre" "agiterEnSpiraleCarree" "agiterEnCercle" "agiterEnSpirale"
-4
+SLIDER
+12
+77
+191
+110
+nombre-reines
+nombre-reines
+0
+100
+14.0
+1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## QU'EST CE QUE C'EST

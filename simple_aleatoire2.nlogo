@@ -1,18 +1,28 @@
+breed [ reines reine]
+breed [ abeilles abeille ]
+
 to setup
   ;; (for this model to work with NetLogo's new plotting features,
   ;; __clear-all-and-reset-ticks should be replaced with clear-all at
   ;; the beginning of your setup procedure and reset-ticks at the end
   ;; of the procedure.)
   __clear-all-and-reset-ticks
-  set-default-shape turtles "airplane"
+  set-default-shape turtles "bug"
 
   ;; place les tortues de maniere aleatoire
-  create-turtles number [
+  create-abeilles nombre-abeilles [
     set color red
     setxy random-xcor random-ycor
     set size 5 ;; pour mieux voir les tortues
   ]
+
+  create-reines nombre-reines [
+    set color green
+    setxy random-xcor random-ycor
+    set size 5 ;; pour mieux voir les tortues
+  ]
 end
+
 
 to agiter
   rt random 50
@@ -20,60 +30,40 @@ to agiter
 end
 
 to agiterEnCarre
-  pendown
-  repeat 4 [fd 5 rt 90]
-  penup
+  repeat 4 [fd 7 rt 90]
+  rt random 50
+  lt random 50
 end
 
-to agiterEnSpiraleCarree
-  pendown
-  let tailleCote 1
-  repeat 16 [
-    set tailleCote tailleCote + 1
-    fd tailleCote
-    rt 90
-  ]
-  penup
-end
-
-to agiterEnCercle
-  pendown
-  let radius 5  ; You can adjust this value for a larger or smaller circle
-  let segments 10  ; More segments will create a smoother circle
-  let angle 360 / segments  ; Calculate the angle for each segment
-
-  repeat segments [
-    forward radius
-    right angle
-  ]
-  penup
-end
-
-to agiterEnSpirale
-  pendown
-  let radius 5  ; You can adjust this value for a larger or smaller circle
-  let segments 10  ; More segments will create a smoother circle
-  let angle 180 / segments  ; Calculate the angle for each segment
-  let numberOfHalfCircle 1
-
-  repeat numberOfHalfCircle [
-    repeat segments [
-       forward radius
-       right angle
-     ]
-    set radius radius + 1
-  ]
-  penup
-end
 
 to go
-  if typeMouvement = "agiter" [ agiter ]
-  if typeMouvement = "agiterEnCarre" [ agiterEnCarre ]
-  if typeMouvement = "agiterEnSpiraleCarree" [ agiterEnSpiraleCarree ]
-  if typeMouvement = "agiterEnCercle" [ agiterEnCercle ]
-  if typeMouvement = "agiterEnSpirale" [ agiterEnSpirale ]
+  ask abeilles [go-abeille radius ]
+  ask reines [go-reine ]
+  tick
+end
+
+to go-abeille [ n ]
+ let nearby-reine one-of reines in-radius n
+ if-else nearby-reine != nobody [
+    let reine-xcor [xcor] of nearby-reine
+    let reine-ycor [ycor] of nearby-reine
+    set heading towards nearby-reine
+ ] [
+    fd 1
+ ]
   fd 1
 end
+
+to go-reine
+ agiter
+ fd 2
+end
+
+;;-------------------------------------------------------
+;;
+;;  Auteur: J. Ferber
+;;
+;;------------------------------------------------------
 @#$#@#$#@
 GRAPHICS-WINDOW
 200
@@ -96,23 +86,23 @@ GRAPHICS-WINDOW
 100
 -100
 100
-0
-0
+1
+1
 0
 ticks
 30.0
 
 BUTTON
-97
-117
-158
-150
+109
+177
+170
+210
 go
 go
 T
 1
 T
-TURTLE
+OBSERVER
 NIL
 NIL
 NIL
@@ -120,10 +110,10 @@ NIL
 1
 
 BUTTON
-24
-117
-85
-150
+29
+176
+90
+209
 setup
 setup
 NIL
@@ -137,35 +127,55 @@ NIL
 1
 
 SLIDER
-6
-37
-177
-70
-number
-number
+14
+32
+185
+65
+nombre-abeilles
+nombre-abeilles
 1
-100
-18.0
+1000
+97.0
 1
 1
 NIL
 HORIZONTAL
 
-CHOOSER
-659
-52
-883
-97
-typeMouvement
-typeMouvement
-"agiter" "agiterEnCarre" "agiterEnSpiraleCarree" "agiterEnCercle" "agiterEnSpirale"
-4
+SLIDER
+15
+75
+187
+108
+nombre-reines
+nombre-reines
+1
+50
+8.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+16
+123
+188
+156
+radius
+radius
+0
+100
+24.0
+1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## QU'EST CE QUE C'EST
 
 Un programme hyper-simpliste o� les tortues avancent de mani�re al�atoires..  
-Un programme qui a �t� r�alis� simplement pour aider � d�marrer..
+Dans ce programme, il y a deux types de tortues, chacune ayant sa propre couleur
 
 ## CREDITS ET REFERENCES
 
