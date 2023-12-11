@@ -45,12 +45,10 @@ end
 to go-abeille [ n ]
  let nearby-reine one-of reines in-radius n
  if-else nearby-reine != nobody [
-    let reine-xcor [xcor] of nearby-reine
-    let reine-ycor [ycor] of nearby-reine
+
     set heading towards nearby-reine
  ] [
-
-    fd 1
+    agiter
  ]
   fd 1
 end
@@ -166,7 +164,7 @@ radius
 radius
 0
 100
-24.0
+18.0
 1
 1
 NIL
