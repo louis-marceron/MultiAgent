@@ -1,70 +1,65 @@
-breed [ reines reine]
-breed [ abeilles abeille ]
-
 to setup
-  ;; (for this model to work with NetLogo's new plotting features,
-  ;; __clear-all-and-reset-ticks should be replaced with clear-all at
-  ;; the beginning of your setup procedure and reset-ticks at the end
-  ;; of the procedure.)
-  __clear-all-and-reset-ticks
+  clear-all
   set-default-shape turtles "bug"
-
-  ;; place les tortues de maniere aleatoire
-  create-abeilles nombre-abeilles [
-    set color red
+  ;; randomly distribute wood chips
+  ask patches
+  [ if random-float 100 < density
+    [ set pcolor yellow ] ]
+  ;; randomly distribute termites
+  create-turtles number [
+    set color white
     setxy random-xcor random-ycor
-    set size 5 ;; pour mieux voir les tortues
-  ]
-
-  create-reines nombre-reines [
-    set color green
-    setxy random-xcor random-ycor
-    set size 5 ;; pour mieux voir les tortues
+    set size 5  ;; easier to see
   ]
 end
 
-
-to agiter
-  rt random 50
-  lt random 50
+to go  ;; turtle procedure
+  search-for-chip
+  find-new-pile
+  put-down-chip
 end
 
-to agiterEnCarre
-  repeat 4 [fd 7 rt 90]
-  rt random 50
-  lt random 50
+to search-for-chip  ;; turtle procedure -- "picks up chip" by turning orange
+  ifelse pcolor = yellow
+  [ set pcolor black
+    set color orange
+    fd 20 ]
+  [ wiggle
+    search-for-chip ]
 end
 
-
-to go
-  ask abeilles [go-abeille radius ]
-  ask reines [go-reine ]
-  tick
+to find-new-pile  ;; turtle procedure -- look for yellow patches
+  if pcolor != yellow
+  [ wiggle
+    find-new-pile ]
 end
 
-to go-abeille [ n ]
- let nearby-reine one-of reines in-radius n
- if-else nearby-reine != nobody [
-    let reine-xcor [xcor] of nearby-reine
-    let reine-ycor [ycor] of nearby-reine
-    set heading towards nearby-reine
- ] [
-
+to put-down-chip  ;; turtle procedure -- finds empty spot & drops chip
+  ifelse pcolor = black
+  [ set pcolor yellow
+    set color white
+    get-away ]
+  [ rt random 360
     fd 1
- ]
+    put-down-chip ]
+end
+
+to get-away  ;; turtle procedure -- escape from yellow piles
+  rt random 360
+  fd 20
+  if pcolor != black
+    [ get-away ]
+end
+
+to wiggle ; turtle procedure
   fd 1
+  rt random 50
+  lt random 50
 end
 
-to go-reine
- agiter
- fd 2
-end
 
-;;-------------------------------------------------------
-;;
-;;  Auteur: J. Ferber
-;;
-;;------------------------------------------------------
+; Copyright 1997 Uri Wilensky.
+; See Info tab for full copyright and license.
 @#$#@#$#@
 GRAPHICS-WINDOW
 200
@@ -87,23 +82,23 @@ GRAPHICS-WINDOW
 100
 -100
 100
-1
-1
+0
+0
 0
 ticks
 30.0
 
 BUTTON
-109
-177
-170
-210
+100
+115
+165
+148
 go
 go
 T
 1
 T
-OBSERVER
+TURTLE
 NIL
 NIL
 NIL
@@ -111,10 +106,10 @@ NIL
 1
 
 BUTTON
-29
-176
+25
+115
 90
-209
+148
 setup
 setup
 NIL
@@ -128,60 +123,109 @@ NIL
 1
 
 SLIDER
-14
-32
+10
+30
 185
-65
-nombre-abeilles
-nombre-abeilles
+63
+number
+number
 1
-1000
-97.0
-1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-15
-75
-187
-108
-nombre-reines
-nombre-reines
-1
-50
-8.0
+2000
+400.0
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-16
-123
-188
-156
-radius
-radius
-0
-100
-24.0
+10
+70
+185
+103
+density
+density
+0.0
+100.0
+20.0
+1.0
 1
-1
-NIL
+%
 HORIZONTAL
 
 @#$#@#$#@
-## QU'EST CE QUE C'EST
+## WHAT IS IT?
 
-Un programme hyper-simpliste o� les tortues avancent de mani�re al�atoires..  
-Dans ce programme, il y a deux types de tortues, chacune ayant sa propre couleur
+This project is inspired by the behavior of termites gathering wood chips into piles. The termites follow a set of simple rules. Each termite starts wandering randomly. If it bumps into a wood chip, it picks the chip up, and continues to wander randomly. When it bumps into another wood chip, it finds a nearby empty space and puts its wood chip down.  With these simple rules, the wood chips eventually end up in a single pile.
 
-## CREDITS ET REFERENCES
+## HOW TO USE IT
 
-Cr�� par J. Ferber  
-http://www.lirmm.fr/~ferber
+Click the SETUP button to set up the termites (white) and wood chips (yellow). Click the GO button to start the simulation.  The termites turn orange when they are carrying a wood chip.
+
+The NUMBER slider controls the number of termites. (Note: Changes in the NUMBER slider do not take effect until the next setup.) The DENSITY slider controls the initial density of wood chips.
+
+## THINGS TO NOTICE
+
+As piles of wood chips begin to form, the piles are not "protected" in any way. That is, termites sometimes take chips away from existing piles. That strategy might seem counter-productive. But if the piles were "protected", you would end up with lots of little piles, not one big one.
+
+The final piles are roughly round.  Why is this?  What other physical situations also produce round things?
+
+In general, the number of piles decreases with time. Why? Some piles disappear, when termites carry away all of the chips. And there is no way to start a new pile from scratch, since termites always put their wood chips near other wood chips. So the number of piles must decrease over time. (The only way a "new" pile starts is when an existing pile splits into two.)
+
+This project is a good example of a "decentralized" strategy. There is no termite in charge, and no special pre-designated site for the piles. Each termite follows a set of simple rules, but the colony as a whole accomplishes a rather sophisticated task.
+
+## THINGS TO TRY
+
+Do the results change if you use just a single termite?  What if you use several thousand termites?
+
+When there are just two piles left, which of them is most likely to "win" as the single, final pile? How often does the larger of the two piles win? If one pile has only a single wood chip, and the other pile has the rest of the wood chips, what are the chances that the first pile will win?
+
+## EXTENDING THE MODEL
+
+Can you extend the model to have the termites sort several colors of wood?
+
+Plot the number of piles, or their average size, or the number of termites carrying wood chips, as the model runs.
+
+## NETLOGO FEATURES
+
+Notice that the wood chips do not exist as objects. They are just represented as colors in the patches. The termites update the patch colors as they pick up and put down the wood chips. In effect, the patches are being used as the data structure. This strategy is useful in many NetLogo programs.
+
+Note than when you stop the GO forever button, the termites keep moving for a little while.  This is because they are each finishing the commands in the GO procedure.  To do this, they must finish their current cycle of finding a chip, finding a pile, and then finding an empty spot near the pile.  In most models, the GO function only moves the model forward one step, but in this model, the GO function is written to advance the turtles through a full cycle of activity.  See the "Buttons" section of the Programming Guide in the User Manual for more information on turtle forever buttons.
+
+## RELATED MODELS
+
+ * Painted Desert Challenge
+ * Shepherds
+ * State Machine Example
+
+## HOW TO CITE
+
+If you mention this model or the NetLogo software in a publication, we ask that you include the citations below.
+
+For the model itself:
+
+* Wilensky, U. (1997).  NetLogo Termites model.  http://ccl.northwestern.edu/netlogo/models/Termites.  Center for Connected Learning and Computer-Based Modeling, Northwestern University, Evanston, IL.
+
+Please cite the NetLogo software as:
+
+* Wilensky, U. (1999). NetLogo. http://ccl.northwestern.edu/netlogo/. Center for Connected Learning and Computer-Based Modeling, Northwestern University, Evanston, IL.
+
+## COPYRIGHT AND LICENSE
+
+Copyright 1997 Uri Wilensky.
+
+![CC BY-NC-SA 3.0](http://ccl.northwestern.edu/images/creativecommons/byncsa.png)
+
+This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 3.0 License.  To view a copy of this license, visit https://creativecommons.org/licenses/by-nc-sa/3.0/ or send a letter to Creative Commons, 559 Nathan Abbott Way, Stanford, California 94305, USA.
+
+Commercial licenses are also available. To inquire about commercial licenses, please contact Uri Wilensky at uri@northwestern.edu.
+
+This model was created as part of the project: CONNECTED MATHEMATICS: MAKING SENSE OF COMPLEX PHENOMENA THROUGH BUILDING OBJECT-BASED PARALLEL MODELS (OBPML).  The project gratefully acknowledges the support of the National Science Foundation (Applications of Advanced Technologies Program) -- grant numbers RED #9552950 and REC #9632612.
+
+This model was developed at the MIT Media Lab using CM StarLogo.  See Resnick, M. (1994) "Turtles, Termites and Traffic Jams: Explorations in Massively Parallel Microworlds."  Cambridge, MA: MIT Press.  Adapted to StarLogoT, 1997, as part of the Connected Mathematics Project.
+
+This model was converted to NetLogo as part of the projects: PARTICIPATORY SIMULATIONS: NETWORK-BASED DESIGN FOR SYSTEMS LEARNING IN CLASSROOMS and/or INTEGRATED SIMULATION AND MODELING ENVIRONMENT. The project gratefully acknowledges the support of the National Science Foundation (REPP & ROLE programs) -- grant numbers REC #9814682 and REC-0126227. Converted from StarLogoT to NetLogo, 2001.
+
+<!-- 1997 2001 MIT -->
 @#$#@#$#@
 default
 true
@@ -484,5 +528,5 @@ true
 Line -7500403 true 150 150 90 180
 Line -7500403 true 150 150 210 180
 @#$#@#$#@
-0
+1
 @#$#@#$#@

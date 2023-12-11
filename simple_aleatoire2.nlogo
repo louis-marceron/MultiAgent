@@ -49,7 +49,7 @@ to go-abeille [ n ]
     let reine-ycor [ycor] of nearby-reine
     set heading towards nearby-reine
  ] [
-    fd 1
+    agiter
  ]
   fd 1
 end
