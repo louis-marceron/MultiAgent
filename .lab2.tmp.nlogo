@@ -67,9 +67,7 @@ end
 to go-cow
   agiter
   fd 1
-  if pcolor != black [
-    manger-herbe
-  ]
+
 end
 
 to agiter
@@ -92,9 +90,6 @@ to suivre-bull
     agiter
  ]
   fd 1
-  if pcolor != black [
-    manger-herbe
-  ]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -212,7 +207,7 @@ consommation-vache
 consommation-vache
 0
 15
-2.0
+3.5
 .5
 1
 NIL
