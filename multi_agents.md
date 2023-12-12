@@ -14,10 +14,10 @@ mindmap
                 (Truth table)
             Theorem proving - Inference
                 (Resolution)
-                (Forward chaining)
-                (Backward chaining)
+                (Forward chaining X)
+                (Backward chaining X)
 
-        First order logic
+        First order logic X
             (PROLOG - using Horn clauses)
 ```
 
