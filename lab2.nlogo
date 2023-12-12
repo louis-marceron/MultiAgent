@@ -1,40 +1,47 @@
+breed  [ cows cow ]
+
 patches-own [
   cpt-init
   cpt
   taille-plante
   taille-max
-  is-increasing
 ]
 
 to setup
   clear-all
+
+  set-default-shape turtles "cow"
+
+  create-cows nombre-vaches [
+    set color pink
+    setxy random-xcor random-ycor
+    set size 2
+  ]
+
   ask patches [
      set cpt-init random-float temps-vie-max
      set cpt cpt-init
      set taille-plante 0
      ;; Taille aléatoire pour que ça soit plus joli 💕
-     set taille-max random-float taille-max-plante
-     set is-increasing true
+     ;; set taille-max random-float taille-max-plante
+     set taille-max taille-max-plante
   ]
   reset-ticks
 end
 
 to go
+  ask cows [ go-cow ]
+  ask patches [ go-patch ]
+  update-plots
+  plot sum [taille-plante] of patches
+end
+
+to go-patch
     if cpt <= 0 [
       set cpt cpt-init
     	
-      if taille-plante >= taille-max [
-         set is-increasing false
-      ]
-
-      if taille-plante <= 0 [
-         set is-increasing true
-      ]
-
-      ifelse is-increasing [
+      if taille-plante < taille-max [
          set taille-plante taille-plante + 1
-      ] [
-         set taille-plante taille-plante - 1
       ]
 
       set pcolor scale-color green taille-plante 0 110
@@ -42,15 +49,35 @@ to go
 
     set cpt cpt - 1
 end
+
+to go-cow
+  agiter
+  fd 1
+  if pcolor != black [
+    manger-herbe
+  ]
+end
+
+to agiter
+  rt random 50
+  lt random 50
+end
+
+to manger-herbe
+  set taille-plante taille-plante - consommation-vache
+  if taille-plante < 0 [
+     set taille-plante 0
+  ]
+end
 @#$#@#$#@
 GRAPHICS-WINDOW
-210
+267
 10
-833
-634
+775
+519
 -1
 -1
-15.0
+20.0
 1
 10
 1
@@ -60,10 +87,10 @@ GRAPHICS-WINDOW
 1
 1
 1
--20
-20
--20
-20
+-12
+12
+-12
+12
 0
 0
 1
@@ -71,10 +98,10 @@ ticks
 60.0
 
 BUTTON
-28
-115
-91
-148
+25
+205
+88
+238
 NIL
 setup
 NIL
@@ -96,23 +123,23 @@ temps-vie-max
 temps-vie-max
 0
 100
-10.0
+18.0
 1
 1
 NIL
 HORIZONTAL
 
 BUTTON
-99
-114
-162
-147
+96
+204
+159
+237
 NIL
 go\n
 T
 1
 T
-PATCH
+OBSERVER
 NIL
 NIL
 NIL
@@ -133,6 +160,54 @@ taille-max-plante
 1
 NIL
 HORIZONTAL
+
+SLIDER
+26
+108
+211
+141
+nombre-vaches
+nombre-vaches
+0
+100
+17.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+27
+158
+266
+191
+consommation-vache
+consommation-vache
+0
+15
+3.0
+.5
+1
+NIL
+HORIZONTAL
+
+PLOT
+28
+271
+228
+421
+taille-plante
+NIL
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" "plot count turtles"
 
 @#$#@#$#@
 ## WHAT IS IT?
