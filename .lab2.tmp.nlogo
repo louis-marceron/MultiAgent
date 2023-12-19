@@ -1,6 +1,6 @@
 breed  [ cows cow ]
 breed  [ bulls bull ]
-breed [ lions lion ]
+breed [ wolves wolf ]
 
 patches-own [
   cpt-init
@@ -14,6 +14,8 @@ to setup
 
   set-default-shape turtles "cow"
 
+  set-default-shape wolves "wolf"
+
   create-cows nombre-vaches [
     set color pink
     setxy random-xcor random-ycor
@@ -22,6 +24,12 @@ to setup
 
   create-bulls 1 [
     set color red
+    setxy random-xcor random-ycor
+    set size 15
+  ]
+
+  create-wolves nombre-loups [
+    set color white
     setxy random-xcor random-ycor
     set size 15
   ]
@@ -38,9 +46,10 @@ to setup
 end
 
 to go
-  ask cows [ suivre-bull ]
+  ask cows [ go-cow ]
   ask patches [ go-patch ]
   ask bulls [ go-bull ]
+  ask wolves [ go-wolf ]
 
   update-plots
   plot sum [taille-plante] of patches
@@ -65,14 +74,6 @@ to go-bull
   fd 2
 end
 
-to go-cow
-  agiter
-  fd 1
-  if pcolor != black [
-    manger-herbe
-  ]
-end
-
 to agiter
   rt random 50
   lt random 50
@@ -85,23 +86,42 @@ to manger-herbe
   ]
 end
 
-to suivre-bull
- let nearby-bull one-of bulls in-radius 30
- if-else nearby-bull != nobody [
+to go-cow
+  let nearby-bull one-of bulls in-radius 30
+  if-else nearby-bull != nobody [
     set heading towards nearby-bull
- ] [
+  ] [
     agiter
- ]
+  ]
   fd 1
   if pcolor != black [
     manger-herbe
   ]
 end
+
+to go-wolf
+  kill-cow
+
+  let nearby-cow one-of cows in-radius distance-perception-loups
+  if-else nearby-cow != nobody [
+    set heading towards nearby-cow
+  ] [
+    agiter
+  ]
+  fd 2
+end
+
+to kill-cow
+  let current-cows other cows-here
+  if current-cows != [
+    ask one-of current-cows [ die ]
+  ]
+end
 @#$#@#$#@
 GRAPHICS-WINDOW
-267
+344
 10
-677
+754
 421
 -1
 -1
@@ -126,10 +146,10 @@ ticks
 60.0
 
 BUTTON
-25
-205
-88
-238
+27
+290
+90
+323
 NIL
 setup
 NIL
@@ -158,10 +178,10 @@ NIL
 HORIZONTAL
 
 BUTTON
-96
-204
-159
-237
+98
+289
+161
+322
 NIL
 go\n
 T
@@ -198,7 +218,7 @@ nombre-vaches
 nombre-vaches
 0
 100
-77.0
+60.0
 1
 1
 NIL
@@ -213,17 +233,17 @@ consommation-vache
 consommation-vache
 0
 30
-15.0
+30.0
 .5
 1
 NIL
 HORIZONTAL
 
 PLOT
-28
-271
-228
-421
+30
+356
+230
+506
 taille-plante
 NIL
 NIL
@@ -236,6 +256,36 @@ false
 "" ""
 PENS
 "default" 1.0 0 -16777216 true "" "plot count turtles"
+
+SLIDER
+29
+201
+201
+234
+nombre-loups
+nombre-loups
+0
+10
+4.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+30
+244
+322
+277
+distance-perception-loups
+distance-perception-loups
+0
+100
+22.0
+1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
