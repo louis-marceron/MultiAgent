@@ -1,5 +1,6 @@
 breed  [ cows cow ]
 breed  [ bulls bull ]
+breed [ lions lion ]
 
 patches-own [
   cpt-init
@@ -16,13 +17,13 @@ to setup
   create-cows nombre-vaches [
     set color pink
     setxy random-xcor random-ycor
-    set size 2
+    set size 9
   ]
 
   create-bulls 1 [
     set color red
     setxy random-xcor random-ycor
-    set size 2
+    set size 15
   ]
 
   ask patches [
@@ -30,8 +31,8 @@ to setup
      set cpt cpt-init
      set taille-plante 0
      ;; Taille aléatoire pour que ça soit plus joli 💕
-     ;; set taille-max random-float taille-max-plante
-     set taille-max taille-max-plante
+     set taille-max random-float taille-max-plante
+     ;; set taille-max taille-max-plante
   ]
   reset-ticks
 end
@@ -67,7 +68,9 @@ end
 to go-cow
   agiter
   fd 1
-
+  if pcolor != black [
+    manger-herbe
+  ]
 end
 
 to agiter
@@ -83,23 +86,26 @@ to manger-herbe
 end
 
 to suivre-bull
- let nearby-bull one-of bulls in-radius 10
+ let nearby-bull one-of bulls in-radius 30
  if-else nearby-bull != nobody [
     set heading towards nearby-bull
  ] [
     agiter
  ]
   fd 1
+  if pcolor != black [
+    manger-herbe
+  ]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
 267
 10
-775
-519
+677
+421
 -1
 -1
-20.0
+2.0
 1
 10
 1
@@ -109,10 +115,10 @@ GRAPHICS-WINDOW
 1
 1
 1
--12
-12
--12
-12
+-100
+100
+-100
+100
 0
 0
 1
@@ -177,7 +183,7 @@ taille-max-plante
 taille-max-plante
 50
 200
-53.0
+50.0
 1
 1
 NIL
@@ -192,7 +198,7 @@ nombre-vaches
 nombre-vaches
 0
 100
-17.0
+77.0
 1
 1
 NIL
@@ -206,8 +212,8 @@ SLIDER
 consommation-vache
 consommation-vache
 0
-15
-3.5
+30
+15.0
 .5
 1
 NIL
