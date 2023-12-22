@@ -9,6 +9,14 @@ patches-own [
   taille-max
 ]
 
+cows-own [
+  energie
+]
+
+wolves-own [
+  energie
+]
+
 to setup
   clear-all
 
@@ -20,6 +28,7 @@ to setup
     set color pink
     setxy random-xcor random-ycor
     set size 9
+    set energie max-energie
   ]
 
   create-bulls 1 [
@@ -32,6 +41,7 @@ to setup
     set color white
     setxy random-xcor random-ycor
     set size 15
+    set energie max-energie
   ]
 
   ask patches [
@@ -81,12 +91,16 @@ end
 
 to manger-herbe
   set taille-plante taille-plante - consommation-vache
+  set energie energie + 10
   if taille-plante < 0 [
      set taille-plante 0
   ]
 end
 
 to go-cow
+  set energie energie - 1
+  if energie <= 0 [ die ]
+
   let nearby-bull one-of bulls in-radius 30
   if-else nearby-bull != nobody [
     set heading towards nearby-bull
@@ -100,8 +114,10 @@ to go-cow
 end
 
 to go-wolf
-  kill-cow
+  set energie energie - 1
+  if energie <= 0 [ die ]
 
+  kill-cow
   let nearby-cow one-of cows in-radius distance-perception-loups
   if-else nearby-cow != nobody [
     set heading towards nearby-cow
@@ -115,17 +131,18 @@ to kill-cow
   let current-cows other cows-here
   if any? current-cows [
     ask one-of current-cows [ die ]
+    set energie energie + 100
   ]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-344
-10
-754
-421
+276
+8
+484
+217
 -1
 -1
-2.0
+1.0
 1
 10
 1
@@ -139,17 +156,17 @@ GRAPHICS-WINDOW
 100
 -100
 100
-0
-0
+1
+1
 1
 ticks
 60.0
 
 BUTTON
-27
-290
-90
-323
+30
+334
+93
+367
 NIL
 setup
 NIL
@@ -178,10 +195,10 @@ NIL
 HORIZONTAL
 
 BUTTON
-98
-289
-161
-322
+101
+333
+164
+366
 NIL
 go\n
 T
@@ -240,10 +257,10 @@ NIL
 HORIZONTAL
 
 PLOT
-30
-356
-230
-506
+33
+400
+233
+550
 taille-plante
 NIL
 NIL
@@ -282,6 +299,21 @@ distance-perception-loups
 0
 100
 22.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+32
+288
+204
+321
+max-energie
+max-energie
+0
+100
+50.0
 1
 1
 NIL
