@@ -1,147 +1,78 @@
-breed  [ cows cow ]
-breed  [ bulls bull ]
-breed [ wolves wolf ]
-
-patches-own [
-  cpt-init
-  cpt
-  taille-plante
-  taille-max
-]
-
-cows-own [
-  energie
-]
-
-wolves-own [
-  energie
-]
+breed [ reines reine]
+breed [ abeilles abeille ]
 
 to setup
-  clear-all
+  ;; (for this model to work with NetLogo's new plotting features,
+  ;; __clear-all-and-reset-ticks should be replaced with clear-all at
+  ;; the beginning of your setup procedure and reset-ticks at the end
+  ;; of the procedure.)
+  __clear-all-and-reset-ticks
+  set-default-shape turtles "bug"
 
-  set-default-shape turtles "cow"
-
-  set-default-shape wolves "wolf"
-
-  create-cows nombre-vaches [
-    set color pink
-    setxy random-xcor random-ycor
-    set size 9
-    set energie max-energie
-  ]
-
-  create-bulls 1 [
+  ;; place les tortues de maniere aleatoire
+  create-abeilles nombre-abeilles [
     set color red
     setxy random-xcor random-ycor
-    set size 15
+    set size 5 ;; pour mieux voir les tortues
   ]
 
-  create-wolves nombre-loups [
-    set color white
+  create-reines nombre-reines [
+    set color green
     setxy random-xcor random-ycor
-    set size 15
-    set energie max-energie
+    set size 5 ;; pour mieux voir les tortues
   ]
-
-  ask patches [
-     set cpt-init random-float temps-vie-max
-     set cpt cpt-init
-     set taille-plante 0
-     ;; Taille aléatoire pour que ça soit plus joli 💕
-     set taille-max random-float taille-max-plante
-     ;; set taille-max taille-max-plante
-  ]
-  reset-ticks
 end
 
-to go
-  ask cows [ go-cow ]
-  ask patches [ go-patch ]
-  ask bulls [ go-bull ]
-  ask wolves [ go-wolf ]
-
-  update-plots
-  plot sum [taille-plante] of patches
-end
-
-to go-patch
-    if cpt <= 0 [
-      set cpt cpt-init
-    	
-      if taille-plante < taille-max [
-         set taille-plante taille-plante + 1
-      ]
-
-      set pcolor scale-color green taille-plante 0 110
-    ]
-
-    set cpt cpt - 1
-end
-
-to go-bull
-  agiter
-  fd 2
-end
 
 to agiter
   rt random 50
   lt random 50
 end
 
-to manger-herbe
-  set taille-plante taille-plante - consommation-vache
-  if taille-plante < 0 [
-     set taille-plante 0
-  ]
+to agiterEnCarre
+  repeat 4 [fd 7 rt 90]
+  rt random 50
+  lt random 50
 end
 
-to go-cow
-  set energie energie - 1
-  if energie <= 0 [ die ]
 
-  let nearby-bull one-of bulls in-radius 30
-  if-else nearby-bull != nobody [
-    set heading towards nearby-bull
-  ] [
+to go
+  ask abeilles [go-abeille radius ]
+  ask reines [go-reine ]
+  tick
+end
+
+to go-abeille [ n ]
+ let nearby-reine one-of reines in-radius n
+ if-else nearby-reine != nobody [
+    let reine-xcor [xcor] of nearby-reine
+    let reine-ycor [ycor] of nearby-reine
+    set heading towards nearby-reine
+ ] [
     agiter
-  ]
+ ]
   fd 1
-  if pcolor != black [
-    manger-herbe
-  ]
 end
 
-to go-wolf
-  set energie energie - 1
-  if energie <= 0 [ die ]
-
-  kill-cow
-  let nearby-cow one-of cows in-radius distance-perception-loups
-  if-else nearby-cow != nobody [
-    set heading towards nearby-cow
-  ] [
-    agiter
-  ]
-  fd 2
+to go-reine
+ agiter
+ fd 2
 end
 
-to kill-cow
-  let current-cows other cows-here
-  if any? current-cows [
-    ask one-of current-cows [ die ]
-    set energie energie + 10
-  ]
-end
+;;-------------------------------------------------------
+;;
+;;  Auteur: J. Ferber
+;;
+;;------------------------------------------------------
 @#$#@#$#@
 GRAPHICS-WINDOW
-276
-8
-484
-217
+200
+10
+610
+421
 -1
 -1
-1.0
+2.0
 1
 10
 1
@@ -155,18 +86,35 @@ GRAPHICS-WINDOW
 100
 -100
 100
-0
-0
 1
+1
+0
 ticks
-60.0
+30.0
 
 BUTTON
-30
-334
-93
-367
+109
+177
+170
+210
+go
+go
+T
+1
+T
+OBSERVER
 NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+29
+176
+90
+209
+setup
 setup
 NIL
 1
@@ -179,181 +127,60 @@ NIL
 1
 
 SLIDER
-26
-10
-198
-43
-temps-vie-max
-temps-vie-max
-0
-100
-18.0
-1
-1
-NIL
-HORIZONTAL
-
-BUTTON
-101
-333
-164
-366
-NIL
-go\n
-T
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
-SLIDER
-25
-60
-197
-93
-taille-max-plante
-taille-max-plante
-50
-200
-50.0
-1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-26
-108
-211
-141
-nombre-vaches
-nombre-vaches
-0
-100
-60.0
-1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-27
-158
-266
-191
-consommation-vache
-consommation-vache
-0
-30
-30.0
-.5
-1
-NIL
-HORIZONTAL
-
-PLOT
-33
-400
-233
-550
-taille-plante
-NIL
-NIL
-0.0
-10.0
-0.0
-10.0
-true
-false
-"" ""
-PENS
-"default" 1.0 0 -16777216 true "" "plot count turtles"
-
-SLIDER
-29
-201
-201
-234
-nombre-loups
-nombre-loups
-0
-10
-4.0
-1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-30
-244
-322
-277
-distance-perception-loups
-distance-perception-loups
-0
-100
-22.0
-1
-1
-NIL
-HORIZONTAL
-
-SLIDER
+14
 32
-288
-204
-321
-max-energie
-max-energie
+185
+65
+nombre-abeilles
+nombre-abeilles
+1
+1000
+97.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+15
+75
+187
+108
+nombre-reines
+nombre-reines
+1
+50
+8.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+16
+123
+188
+156
+radius
+radius
 0
 100
-50.0
+24.0
 1
 1
 NIL
 HORIZONTAL
 
 @#$#@#$#@
-## WHAT IS IT?
+## QU'EST CE QUE C'EST
 
-(a general understanding of what the model is trying to show or explain)
+Un programme hyper-simpliste o� les tortues avancent de mani�re al�atoires..  
+Dans ce programme, il y a deux types de tortues, chacune ayant sa propre couleur
 
-## HOW IT WORKS
+## CREDITS ET REFERENCES
 
-(what rules the agents use to create the overall behavior of the model)
-
-## HOW TO USE IT
-
-(how to use the model, including a description of each of the items in the Interface tab)
-
-## THINGS TO NOTICE
-
-(suggested things for the user to notice while running the model)
-
-## THINGS TO TRY
-
-(suggested things for the user to try to do (move sliders, switches, etc.) with the model)
-
-## EXTENDING THE MODEL
-
-(suggested things to add or change in the Code tab to make the model more complicated, detailed, accurate, etc.)
-
-## NETLOGO FEATURES
-
-(interesting or unusual features of NetLogo that the model uses, particularly in the Code tab; or where workarounds were needed for missing features)
-
-## RELATED MODELS
-
-(models in the NetLogo Models Library and elsewhere which are of related interest)
-
-## CREDITS AND REFERENCES
-
-(a reference to the model's URL on the web if it has one, as well as any other necessary credits, citations, and links)
+Cr�� par J. Ferber  
+http://www.lirmm.fr/~ferber
 @#$#@#$#@
 default
 true
@@ -547,22 +374,6 @@ Polygon -7500403 true true 135 105 90 60 45 45 75 105 135 135
 Polygon -7500403 true true 165 105 165 135 225 105 255 45 210 60
 Polygon -7500403 true true 135 90 120 45 150 15 180 45 165 90
 
-sheep
-false
-15
-Circle -1 true true 203 65 88
-Circle -1 true true 70 65 162
-Circle -1 true true 150 105 120
-Polygon -7500403 true false 218 120 240 165 255 165 278 120
-Circle -7500403 true false 214 72 67
-Rectangle -1 true true 164 223 179 298
-Polygon -1 true true 45 285 30 285 30 240 15 195 45 210
-Circle -1 true true 3 83 150
-Rectangle -1 true true 65 221 80 296
-Polygon -1 true true 195 285 210 285 210 240 240 210 195 210
-Polygon -7500403 true false 276 85 285 105 302 99 294 83
-Polygon -7500403 true false 219 85 210 105 193 99 201 83
-
 square
 false
 0
@@ -647,13 +458,6 @@ Line -7500403 true 40 84 269 221
 Line -7500403 true 40 216 269 79
 Line -7500403 true 84 40 221 269
 
-wolf
-false
-0
-Polygon -16777216 true false 253 133 245 131 245 133
-Polygon -7500403 true true 2 194 13 197 30 191 38 193 38 205 20 226 20 257 27 265 38 266 40 260 31 253 31 230 60 206 68 198 75 209 66 228 65 243 82 261 84 268 100 267 103 261 77 239 79 231 100 207 98 196 119 201 143 202 160 195 166 210 172 213 173 238 167 251 160 248 154 265 169 264 178 247 186 240 198 260 200 271 217 271 219 262 207 258 195 230 192 198 210 184 227 164 242 144 259 145 284 151 277 141 293 140 299 134 297 127 273 119 270 105
-Polygon -7500403 true true -1 195 14 180 36 166 40 153 53 140 82 131 134 133 159 126 188 115 227 108 236 102 238 98 268 86 269 92 281 87 269 103 269 113
-
 x
 false
 0
@@ -662,6 +466,8 @@ Polygon -7500403 true true 30 75 75 30 270 225 225 270
 @#$#@#$#@
 NetLogo 6.4.0
 @#$#@#$#@
+setup
+ask turtles [ repeat 150 [ go ] ]
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
