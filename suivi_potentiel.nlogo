@@ -1,9 +1,22 @@
-breed [ reines reine]
-breed [ abeilles abeille ]
+globals [food-sources]
 
 patches-own [
-  odeur
+ ;; chemical             ;; amount of chemical on this patch
+  chemical1
+  chemical2
+  source
 ]
+
+
+turtles-own
+[
+  peak? ;; indicates whether a turtle has reached a "peak",
+        ;; that is, it can no longer go "uphill" from where it stands
+]
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Setup procedures ;;;
+;;;;;;;;;;;;;;;;;;;;;;;;
 
 to setup
   ;; (for this model to work with NetLogo's new plotting features,
@@ -12,72 +25,93 @@ to setup
   ;; of the procedure.)
   __clear-all-and-reset-ticks
   set-default-shape turtles "bug"
+  ask patches [set pcolor black]
+  ask n-of location-number patches [set source 1 set pcolor green set chemical1 (chemical-max / 1.3)]
+  ask n-of location-number patches [set source 2 set pcolor red set chemical2 (chemical-max / 1.3)]
+  repeat diffusion-turn [diffuse-food-chemicals]
+  setup-turtles
+  ask patches [recolor-patch ]
+end
 
-  ;; place les tortues de maniere aleatoire
-  create-abeilles nombre-abeilles [
-    set color red
-    setxy random-xcor random-ycor
-    set size 5 ;; pour mieux voir les tortues
-  ]
-
-  create-reines nombre-reines [
-    set color green
-    setxy random-xcor random-ycor
-    set size 5 ;; pour mieux voir les tortues
-
-  ]
-
-  ask patches [
-    set max-odeur 50
-    set odeur 0
+to setup-turtles
+  ;; put some turtles on patch centers in the landscape
+  ask n-of turtles-number patches [
+    sprout 1 [
+      set peak? false
+      set color yellow
+      ;; pen-down
+    ]
   ]
 end
 
 
-to agiter
+to diffuse-food-chemicals
+  diffuse chemical1 (diffusion-rate / 100)
+  diffuse chemical2 (diffusion-rate / 100)
+end
+
+to setup-patches
+end
+
+to recolor-patch
+  if (source != 1 and source != 2)[
+    ifelse (chemical1 > 0 or chemical2 > 0)
+       [ifelse (chemical1 > chemical2)
+         [ set pcolor scale-color green chemical1 0.1 5]
+         [ set pcolor scale-color red chemical2 0.1 5]
+       ]
+       [set pcolor black]
+   ]
+end
+
+to wiggle
   rt random 50
   lt random 50
 end
 
 
-to go
-  ask abeilles [go-abeille radius ]
-  ask reines [go-reine ]
-  ask patches [set pcolor scale-color yellow odeur 1 (max-odeur / 1.3) ]
+;;;;;;;;;;;;;;;;;;;;;
+;;; Go procedures ;;;
+;;;;;;;;;;;;;;;;;;;;;
+
+to go  ;; forever button
+  ;; diffuse chemical (diffusion-rate / 100)
+  ;; stop when all turtles are on peak
+  if all? turtles [peak?]
+    [ stop ]
+  ask turtles [ follow-chemical]
+  ask patches [ evaporate ]
+  ask patches [recolor-patch ]
   tick
 end
 
-to go-abeille [ n ]
- let nearby-reine one-of reines in-radius n
- if-else nearby-reine != nobody [
-    let reine-xcor [xcor] of nearby-reine
-    let reine-ycor [ycor] of nearby-reine
-    set heading towards nearby-reine
- ] [
-    agiter
- ]
-  fd 1
+to evaporate
+  set chemical1 chemical1 * (100 - evaporation-rate1) / 100  ;; slowly evaporate chemical
+  set chemical2 chemical2 * (100 - evaporation-rate2) / 100  ;; slowly evaporate chemical
 end
 
-to go-reine
- agiter
- fd 1
+to follow-chemical
+    ifelse (chemical1 <= chemical-min and chemical2 <= chemical-min)
+      [wiggle fd 1]
+      [ifelse (chemical1 <= chemical2)
+        [let old-patch patch-here
+          uphill chemical2
+          if old-patch = patch-here [ set peak? true ]]
+        [let old-patch patch-here
+          uphill chemical1
+          if old-patch = patch-here [ set peak? true ]
+          ]
+        ]
 end
-
-;;-------------------------------------------------------
-;;
-;;  Auteur: J. Ferber
-;;
-;;------------------------------------------------------
 @#$#@#$#@
 GRAPHICS-WINDOW
-200
+257
 10
-610
-421
+762
+516
 -1
 -1
-2.0
+7.0
 1
 10
 1
@@ -87,24 +121,24 @@ GRAPHICS-WINDOW
 1
 1
 1
--100
-100
--100
-100
+-35
+35
+-35
+35
 1
 1
-0
+1
 ticks
 30.0
 
 BUTTON
-100
-271
-161
-304
-go
-go
-T
+30
+70
+110
+103
+NIL
+setup
+NIL
 1
 T
 OBSERVER
@@ -113,15 +147,30 @@ NIL
 NIL
 NIL
 1
+
+SLIDER
+20
+215
+210
+248
+diffusion-rate
+diffusion-rate
+0.0
+99.0
+99.0
+1.0
+1
+NIL
+HORIZONTAL
 
 BUTTON
-20
-270
-81
-303
-setup
-setup
+120
+70
+195
+103
 NIL
+go
+T
 1
 T
 OBSERVER
@@ -132,90 +181,119 @@ NIL
 1
 
 SLIDER
-14
-32
-185
-65
-nombre-abeilles
-nombre-abeilles
-1
-1000
-97.0
-1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-15
-75
-187
-108
-nombre-reines
-nombre-reines
+20
+168
+210
+201
+location-number
+location-number
 1
 50
-8.0
+1.0
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-16
-123
-188
-156
-radius
-radius
-0
+20
+263
+212
+296
+chemical-max
+chemical-max
 100
-24.0
+2000
+2000.0
+10
+1
+NIL
+HORIZONTAL
+
+SLIDER
+20
+125
+210
+158
+diffusion-turn
+diffusion-turn
+1
+100
+73.0
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-15
-175
-187
-208
-taux-diffusion
-taux-diffusion
-0
-100
-50.0
+21
+313
+214
+346
+turtles-number
+turtles-number
+1
+500
+166.0
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-15
-217
-187
-250
-max-odeur
-max-odeur
+23
+360
+211
+393
+chemical-min
+chemical-min
 0
-100
-50.0
+10
+1.2
+0.2
 1
+NIL
+HORIZONTAL
+
+SLIDER
+22
+405
+194
+438
+evaporation-rate1
+evaporation-rate1
+0
+20
+0.0
+1.0
+1
+NIL
+HORIZONTAL
+
+SLIDER
+22
+450
+194
+483
+evaporation-rate2
+evaporation-rate2
+0
+20
+0.0
+1.0
 1
 NIL
 HORIZONTAL
 
 @#$#@#$#@
-## QU'EST CE QUE C'EST
+Qu'est ce que c'est
 
-Un programme hyper-simpliste o� les tortues avancent de mani�re al�atoires..  
-Dans ce programme, il y a deux types de tortues, chacune ayant sa propre couleur
+D�monstration du fonctionnement de suivi de potentiel par uphill. Des fourmis suivent des odeurs et remontent un gradient d'odeur..
 
-## CREDITS ET REFERENCES
+Comment l'utiliser
 
-Cr�� par J. Ferber  
-http://www.lirmm.fr/~ferber
+Quelques param�tres concernant l'�vaporation et la diffusion des odeurs.  
+Le param�tre chemical-min qui donne la sensibilit� minimale des agents.. 
 @#$#@#$#@
 default
 true
@@ -501,8 +579,6 @@ Polygon -7500403 true true 30 75 75 30 270 225 225 270
 @#$#@#$#@
 NetLogo 6.4.0
 @#$#@#$#@
-setup
-ask turtles [ repeat 150 [ go ] ]
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
